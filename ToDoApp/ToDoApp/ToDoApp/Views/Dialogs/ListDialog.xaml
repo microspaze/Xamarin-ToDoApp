@@ -7,9 +7,13 @@
              CornerRadius="24"
              BackgroundColor="{AppThemeBinding Light={StaticResource LightCardUnselectedBackgroundColor}, Dark={StaticResource DarkCardUnselectedBackgroundColor}}">
     <prism:DialogLayout.Mask>
-        <StackLayout BackgroundColor="{AppThemeBinding Light={StaticResource LightTransparentBackgroundColor}, Dark={StaticResource DarkTransparentBackgroundColor}}"
+        <StackLayout BackgroundColor="Gray"
                      HorizontalOptions="FillAndExpand"
-                     VerticalOptions="FillAndExpand"></StackLayout>
+                     VerticalOptions="FillAndExpand">
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseDialogCommand}"/>
+            </StackLayout.GestureRecognizers>
+        </StackLayout>
     </prism:DialogLayout.Mask>
     <StackLayout>
         <Label
@@ -46,5 +50,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <Button Command="{Binding CloseDialogCommand}" Text="Close"/>
     </StackLayout>
 </Frame>

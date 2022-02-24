@@ -76,9 +76,9 @@
             </Grid>
             <Grid
                 Grid.Row="2"
-                Margin="15, 0"
-                HeightRequest="35"
-                ColumnDefinitions="Auto, *, 35, 35">
+                Margin="15, 0, 15, 5"
+                HeightRequest="40"
+                ColumnDefinitions="Auto, *, 40, 40">
                 <Label
                     Grid.Column="0"
                     Text="{Binding Week.WeekString}"
@@ -87,7 +87,7 @@
                     VerticalOptions="Center"></Label>
                 <Button
                     Grid.Column="2"
-                    CornerRadius="15"
+                    CornerRadius="20"
                     Text="&#xf053;"
                     TextColor="{AppThemeBinding Light={StaticResource LightButtonTextColor}, Dark={StaticResource DarkButtonTextColor}}"
                     FontSize="{StaticResource Body2FontSize}"
@@ -97,7 +97,7 @@
                     CommandParameter="{Binding Week.StartDay}"></Button>
                 <Button
                     Grid.Column="3"
-                    CornerRadius="15"
+                    CornerRadius="20"
                     Text="&#xf054;"
                     TextColor="{AppThemeBinding Light={StaticResource LightButtonTextColor}, Dark={StaticResource DarkButtonTextColor}}"
                     FontSize="{StaticResource Body2FontSize}"
@@ -117,7 +117,7 @@
                         <Frame
                             Grid.Column="{Binding Column}"
                             Padding="4, 8, 4, 8"
-                            CornerRadius="16"
+                            CornerRadius="6"
                             xct:TouchEffect.NativeAnimation="True">
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding BindingContext.DayCommand, Source={x:Reference daysList}}" CommandParameter="{Binding .}"></TapGestureRecognizer>
@@ -459,21 +459,22 @@
                 </CollectionView>
             </StackLayout>
             <Frame 
-                Grid.Row="5" 
+                Grid.Row="5"
+                HasShadow="True"
                 BackgroundColor="{AppThemeBinding Light={StaticResource LightButtonColor}, Dark={StaticResource DarkButtonColor}}"
                 VerticalOptions="End" 
                 HorizontalOptions="End" 
-                CornerRadius="20" 
-                TranslationY="-20" 
-                TranslationX="-20"
-                Padding="20"
+                CornerRadius="25" 
+                TranslationY="-15" 
+                TranslationX="-15"
+                Padding="15"
                 xct:TouchEffect.NativeAnimation="True">
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding AddCommand}"></TapGestureRecognizer>
                 </Frame.GestureRecognizers>
                 <Label
-                    Text="&#xf067;"
-                    FontSize="{StaticResource Headline3FontSize}"
+                    Text="&#xf067;" WidthRequest="20" HeightRequest="20"
+                    FontSize="20" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"
                     FontFamily="FontAwesome_Solid"
                     TextColor="{AppThemeBinding Light={StaticResource LightButtonTextColor}, Dark={StaticResource DarkButtonTextColor}}"
                     HorizontalOptions="Center"

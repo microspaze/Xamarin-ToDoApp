@@ -37,7 +37,9 @@ namespace ToDoApp.ViewModels.Dialogs
 
         #region Commands 
 
-        public ICommand ChangeSelectListCommand { get; set; }
+        public ICommand ChangeSelectListCommand { get; private set; }
+
+        public ICommand CloseDialogCommand { get; private set; }
 
         #endregion
 
@@ -50,6 +52,7 @@ namespace ToDoApp.ViewModels.Dialogs
             _listRepository = listRepository;
 
             ChangeSelectListCommand = new Command(ChangeSelectListCommandHandler);
+            CloseDialogCommand = new Command(CloseListDialog);
 
             MainState = LayoutState.Loading;
         }
@@ -75,15 +78,27 @@ namespace ToDoApp.ViewModels.Dialogs
             }
         }
 
+        private void CloseListDialog()
+        {
+            var param = new DialogParameters()
+            {
+                { "selectedList", SelectedList.Name }
+            };
+            RequestClose(param);
+        }
+
         #endregion
 
         #region Dialog
 
         public event Action<IDialogParameters> RequestClose;
 
-        public bool CanCloseDialog() => true;
+        public virtual bool CanCloseDialog()
+        {
+            return true;
+        }
 
-        public void OnDialogClosed()
+        public virtual void OnDialogClosed()
         { }
 
         public async void OnDialogOpened(IDialogParameters parameters)

@@ -18,6 +18,7 @@
                     <Entry
                         Placeholder="Enter list name"
                         Text="{Binding Name.Value}"
+                        TextColor="{Binding Color.Value}"
                         Style="{StaticResource Base_Entry}">
                         <Entry.Behaviors>
                             <xct:EventToCommandBehavior
@@ -49,45 +50,31 @@
 					TextColor="{StaticResource FailColor}" />
             </StackLayout>
             <StackLayout
+                RadioButtonGroup.GroupName="Colors"
+                RadioButtonGroup.SelectedValue="{Binding Color.Value}"
                 Spacing="5">
                 <Label
                     Text="Color"
                     Style="{StaticResource Body1_MulishSemiBold}"></Label>
                 <CollectionView
                     ItemsSource="{Binding ColorList}"
-                    SelectedItem="{Binding Color.Value}"
                     SelectionMode="Single"
-                    HeightRequest="45">
+                    HeightRequest="46">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5"></LinearItemsLayout>
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <StackLayout
+                                BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackgroundColor}, Dark={StaticResource DarkPageBackgroundColor}}"
                                 Margin="0"
                                 Spacing="5"
                                 Padding="0">
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup Name="CommonStates">
-                                        <VisualState Name="Selected">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightPageBackgroundColor}, Dark={StaticResource DarkPageBackgroundColor}}" />
-                                                <Setter TargetName="Circle" Property="Frame.BorderColor" Value="{AppThemeBinding Light={StaticResource LightPrimaryTextColor}, Dark={StaticResource DarkPrimaryTextColor}}"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState Name="Normal">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightPageBackgroundColor}, Dark={StaticResource DarkPageBackgroundColor}}" />
-                                                <Setter TargetName="Circle" Property="Frame.BorderColor" Value="{AppThemeBinding Light={StaticResource LightCardBorderColor}, Dark={StaticResource DarkCardBorderColor}}"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                                <Frame
-                                    x:Name="Circle"
-                                    xct:TouchEffect.NativeAnimation="True"
-                                    BackgroundColor="{Binding .}"
-                                    CornerRadius="40">
+                                <Frame Padding="0" HasShadow="False" BackgroundColor="{Binding .}" CornerRadius="6">
+                                    <RadioButton Value="{Binding .}"
+                                             Margin="3, 3, 0, 3"
+                                             BackgroundColor="Transparent" GroupName="Colors">
+                                    </RadioButton>
                                 </Frame>
                             </StackLayout>
                         </DataTemplate>

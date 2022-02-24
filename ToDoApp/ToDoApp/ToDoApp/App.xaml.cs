@@ -1,6 +1,7 @@
 ﻿using Prism;
 using Prism.DryIoc;
 using Prism.Ioc;
+using System;
 using ToDoApp.Auth;
 using ToDoApp.Models;
 using ToDoApp.Repositories.FirestoreRepository;
@@ -32,15 +33,22 @@ namespace ToDoApp
 {
     public partial class App : PrismApplication
     {
-        public App() : this(null) { }
+        public App() : this(null)
+        {
+            Console.WriteLine("App 6");
+        }
 
         public App(IPlatformInitializer initializer) : base(initializer) 
-        { }
+        {
+            Console.WriteLine("App 5");
+        }
 
         public new static App Current => Application.Current as App;
 
         protected override async void OnInitialized()
         {
+            Console.WriteLine("App 3");
+
             InitializeComponent();
             SetAppTheme();
 
@@ -54,10 +62,14 @@ namespace ToDoApp
             {
                 await NavigationService.NavigateAsync($"/{nameof(NavigationPage)}/{nameof(WelcomePage)}");
             }
+
+            Console.WriteLine("App 4");
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            Console.WriteLine("App 1");
+
             containerRegistry.RegisterRegionServices();
 
             containerRegistry.Register<IDateService, DateService>();
@@ -80,10 +92,15 @@ namespace ToDoApp
 
             containerRegistry.RegisterDialog<ListDialog, ListDialogViewModel>();
             containerRegistry.RegisterDialog<ErrorDialog, ErrorDialogViewModel>();
+
+            Console.WriteLine("App 2");
         }
 
         protected override void OnStart()
         {
+            Console.WriteLine("App 7");
+
+            Console.WriteLine("App 8");
         }
 
         protected override void OnSleep()

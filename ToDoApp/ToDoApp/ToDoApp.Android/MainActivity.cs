@@ -3,6 +3,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Firebase;
+using ToDoApp.Auth;
 using ToDoApp.Droid.Auth;
 
 namespace ToDoApp.Droid
@@ -20,8 +21,15 @@ namespace ToDoApp.Droid
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
-            Xamarin.Forms.DependencyService.Register<FirebaseAuthentication>();
-            FirebaseApp.InitializeApp(Application.Context);
+            if (Helpers.Constants.IsLocalMode)
+            {
+                Xamarin.Forms.DependencyService.Register<IFirebaseAuthentication, LocalAuthentication>();
+            }
+            else
+            {
+                Xamarin.Forms.DependencyService.Register<IFirebaseAuthentication, FirebaseAuthentication>();
+                FirebaseApp.InitializeApp(Application.Context);
+            }
 
             LoadApplication(new App());
         }

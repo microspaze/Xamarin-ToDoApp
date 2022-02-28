@@ -128,8 +128,23 @@
                     </Switch.Behaviors>
                 </Switch>
             </StackLayout>
+            <StackLayout 
+                Orientation="Horizontal">
+                <Label
+                    Style="{StaticResource Body1_MulishRegular}"
+                    Text="Local data mode"
+                    TextColor="{AppThemeBinding Light={StaticResource LightSecondaryTextColor}, Dark={StaticResource DarkSecondaryTextColor}}"></Label>
+                    <Switch
+                    IsToggled="{Binding IsLocalMode}"
+                    HorizontalOptions="EndAndExpand"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource LightPageBackgroundColor}, Dark={StaticResource DarkPageBackgroundColor}}"
+                    ThumbColor="{AppThemeBinding Light={StaticResource LightPrimaryTextColor}, Dark={StaticResource DarkPrimaryTextColor}}"
+                    OnColor="{AppThemeBinding Light={StaticResource LightSecondaryTextColor}, Dark={StaticResource DarkSecondaryTextColor}}">
+                    </Switch>
+            </StackLayout>
             <Label
                 Style="{StaticResource Base_Link}"
+                HorizontalOptions="CenterAndExpand"
                 Text="Log out">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding LogOutCommand}"></TapGestureRecognizer>

@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ToDoApp.Auth;
+using ToDoApp.Helpers;
 using ToDoApp.Models;
+using ToDoApp.Repositories;
 using ToDoApp.Repositories.FirestoreRepository;
+using ToDoApp.Repositories.Localstore;
 using ToDoApp.Views;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Essentials;
@@ -19,8 +22,8 @@ namespace ToDoApp.ViewModels
     {
         #region Private & Protected
 
-        private IFirestoreRepository<TaskModel> _taskRepository;
-        private IFirestoreRepository<ListModel> _listRepository;
+        private IRepository<TaskModel> _taskRepository;
+        private IRepository<ListModel> _listRepository;
 
         #endregion
 
@@ -37,6 +40,7 @@ namespace ToDoApp.ViewModels
 
         public ProfileDetailsModel ProfileDetails { get; set; }
         public string Username { get; set; }
+        public bool IsLocalMode { get; set; } = true;
         public bool IsDarkMode { get; set; }
         public bool IsHideEnabled { get; set; }
 
@@ -46,8 +50,8 @@ namespace ToDoApp.ViewModels
 
         public ProfilePageViewModel(
             INavigationService navigationService,
-            IFirestoreRepository<TaskModel> taskRepository,
-            IFirestoreRepository<ListModel> listRepository) : base(navigationService)
+            IRepository<TaskModel> taskRepository,
+            IRepository<ListModel> listRepository) : base(navigationService)
         {
             _taskRepository = taskRepository;
             _listRepository = listRepository;
@@ -112,18 +116,37 @@ namespace ToDoApp.ViewModels
             Preferences.Set("hideDoneTasks", IsHideEnabled);
         }
 
+        private void OnIsLocalModeChanged()
+        {
+            Constants.IsLocalMode = IsLocalMode;
+            Preferences.Set("IsLocalMode", IsLocalMode);
+
+            if (IsLocalMode)
+            {
+                DependencyService.Register<IRepository<TaskModel>, TasksLocalRepository>();
+                DependencyService.Register<IRepository<ListModel>, ListsLocalRepository>();
+            }
+            else
+            {
+                DependencyService.Register<IRepository<TaskModel>, TasksRepository>();
+                DependencyService.Register<IRepository<ListModel>, ListsRepository>();
+            }
+
+            this.LogOutCommandHandler();
+        }
+
         private async Task GetProfileDetails()
         {
             var auth = DependencyService.Get<IFirebaseAuthentication>();
             var userId = auth.GetUserId();
-            var lists = await _listRepository.GetAll(userId).GetAsync();
-            var tasks = await _taskRepository.GetAll(userId).GetAsync();
+            var lists = await _listRepository.GetAllAsync(userId);
+            var tasks = await _taskRepository.GetAllAsync(userId);
 
             ProfileDetails = new ProfileDetailsModel()
             {
-                TotalLists = lists.Count,
-                TotalTasks = tasks.Count,
-                DoneTasks = tasks.ToObjects<TaskModel>().Count(t => t.Archived == true)
+                TotalLists = lists.Count(),
+                TotalTasks = tasks.Count(),
+                DoneTasks = tasks.Count(t => t.Archived == true)
             };
         }
 

@@ -4,17 +4,22 @@
              x:Class="ToDoApp.Views.Dialogs.ListDialog"
              xmlns:prism="http://prismlibrary.com"
              prism:DialogLayout.RelativeWidthRequest=".85"
-             CornerRadius="24"
+             prism:DialogLayout.CloseOnBackgroundTapped="True"
+             CornerRadius="20"
              BackgroundColor="{AppThemeBinding Light={StaticResource LightCardUnselectedBackgroundColor}, Dark={StaticResource DarkCardUnselectedBackgroundColor}}">
     <prism:DialogLayout.Mask>
-        <StackLayout BackgroundColor="Gray"
-                     HorizontalOptions="FillAndExpand"
+        <StackLayout HorizontalOptions="FillAndExpand"
                      VerticalOptions="FillAndExpand">
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding CloseDialogCommand}"/>
             </StackLayout.GestureRecognizers>
         </StackLayout>
     </prism:DialogLayout.Mask>
+    <prism:DialogLayout.MaskStyle>
+        <Style TargetType="BoxView">
+            <Setter Property="Opacity" Value="0.9"/>
+        </Style>
+    </prism:DialogLayout.MaskStyle>
     <StackLayout>
         <Label
             Style="{StaticResource Headline4_MulishBlack}"

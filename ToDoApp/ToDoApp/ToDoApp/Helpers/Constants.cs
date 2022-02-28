@@ -3,11 +3,28 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using ToDoApp.Models;
+using Xamarin.Essentials;
 
 namespace ToDoApp.Helpers
 {
     public static class Constants
     {
+        private static bool? _isLocalMode = null;
+
+        public static bool IsLocalMode
+        {
+            get
+            {
+                if (_isLocalMode == null)
+                {
+                    _isLocalMode = Preferences.Get("IsLocalMode", true);
+                }
+
+                return _isLocalMode.Value;
+            }
+            set { _isLocalMode = value; }
+        }
+
         public static ObservableCollection<string> AddOptions = new ObservableCollection<string>() {
             "task",
             "list"

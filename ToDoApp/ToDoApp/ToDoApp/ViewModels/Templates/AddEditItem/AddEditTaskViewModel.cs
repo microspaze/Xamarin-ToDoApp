@@ -11,7 +11,7 @@ using ToDoApp.Helpers;
 using ToDoApp.Helpers.Validations;
 using ToDoApp.Helpers.Validations.Rules;
 using ToDoApp.Models;
-using ToDoApp.Repositories.FirestoreRepository;
+using ToDoApp.Repositories;
 using ToDoApp.Views.Dialogs;
 using Xamarin.Forms;
 
@@ -22,7 +22,7 @@ namespace ToDoApp.ViewModels.Templates.AddEditItem
         #region Private & Protected
 
         private IDialogService _dialogService;
-        private IFirestoreRepository<TaskModel> _taskRepository;
+        private IRepository<TaskModel> _taskRepository;
 
         private bool _archived;
         private string _id;
@@ -54,7 +54,7 @@ namespace ToDoApp.ViewModels.Templates.AddEditItem
         public AddEditTaskViewModel(
             INavigationService navigationService,
             IDialogService dialogService,
-            IFirestoreRepository<TaskModel> taskRepository) : base(navigationService)
+            IRepository<TaskModel> taskRepository) : base(navigationService)
         {
             _dialogService = dialogService;
             _taskRepository = taskRepository;

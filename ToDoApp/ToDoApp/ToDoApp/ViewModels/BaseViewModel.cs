@@ -34,7 +34,7 @@ namespace ToDoApp.ViewModels
         {
             _navigationService = navigationService;
             Connectivity.ConnectivityChanged += ConnectivityChanged;
-            HasNoInternetConnection = !Connectivity.NetworkAccess.Equals(NetworkAccess.Internet);
+            ToggleConnectionError(Connectivity.NetworkAccess.Equals(NetworkAccess.Internet));
         }
 
         #endregion
@@ -52,7 +52,19 @@ namespace ToDoApp.ViewModels
 
         private void ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
         {
-            HasNoInternetConnection = !e.NetworkAccess.Equals(NetworkAccess.Internet);
+            ToggleConnectionError(e.NetworkAccess.Equals(NetworkAccess.Internet));
+        }
+
+        private void ToggleConnectionError(bool hasNetwork)
+        {
+            if (Helpers.Constants.IsLocalMode)
+            {
+                HasNoInternetConnection = false;
+            }
+            else
+            {
+                HasNoInternetConnection = !hasNetwork;
+            }
         }
 
         #endregion

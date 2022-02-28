@@ -4,7 +4,8 @@
              x:Class="ToDoApp.Views.Dialogs.ErrorDialog"
              xmlns:prism="http://prismlibrary.com"
              prism:DialogLayout.RelativeWidthRequest=".85"
-             CornerRadius="24"
+             prism:DialogLayout.CloseOnBackgroundTapped="True"
+             CornerRadius="20"
              BackgroundColor="{AppThemeBinding Light={StaticResource LightCardUnselectedBackgroundColor}, Dark={StaticResource DarkCardUnselectedBackgroundColor}}">
     <prism:DialogLayout.Mask>
         <StackLayout BackgroundColor="{AppThemeBinding Light={StaticResource LightTransparentBackgroundColor}, Dark={StaticResource DarkTransparentBackgroundColor}}"

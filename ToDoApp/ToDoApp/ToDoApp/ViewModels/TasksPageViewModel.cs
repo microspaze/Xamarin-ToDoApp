@@ -2,6 +2,7 @@
 using Plugin.CloudFirestore.Reactive;
 using Prism.Navigation;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using ToDoApp.Auth;
 using ToDoApp.Models;
-using ToDoApp.Repositories.FirestoreRepository;
+using ToDoApp.Repositories;
 using ToDoApp.Services.DateService;
 using ToDoApp.Views;
 using Xamarin.CommunityToolkit.UI.Views;
@@ -28,7 +29,7 @@ namespace ToDoApp.ViewModels
         #region Private & Protected
 
         private IDateService _dateService;
-        private IFirestoreRepository<TaskModel> _taskRepository;
+        private IRepository<TaskModel> _taskRepository;
 
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
         private DayModel _selectedDay;
@@ -69,7 +70,7 @@ namespace ToDoApp.ViewModels
 
         public TasksPageViewModel(
             INavigationService navigationService,
-            IFirestoreRepository<TaskModel> tasksRepository,
+            IRepository<TaskModel> tasksRepository,
             IDateService dateService) : base(navigationService)
         {
             _taskRepository = tasksRepository;
@@ -220,45 +221,29 @@ namespace ToDoApp.ViewModels
             try
             {
                 TaskListState = LayoutState.Loading;
-                _disposables.Clear();
                 TaskList.Clear();
-                IQuery query;
                 var auth = DependencyService.Get<IFirebaseAuthentication>();
                 var userId = auth.GetUserId();
                 var list = Preferences.Get("taskFilterByList", "All lists");
                 var hideDoneTask = Preferences.Get("hideDoneTasks", false);
                 SetFilterName(list);
-                query = list == "All lists" ?
-                    hideDoneTask == false ?
-                    _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy")) :
-                    _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy"), "archived", !hideDoneTask) :
-                    hideDoneTask == false ?
-                    _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy"), "list", list) :
-                    _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy"), "list", list, "archived", !hideDoneTask);
-                _disposables.Add(query.ObserveAdded()
-                    .Select(change => (Object: change.Document.ToObject<TaskModel>(ServerTimestampBehavior.Estimate), Index: change.NewIndex))
-                    .Subscribe(t =>
+
+                if (Helpers.Constants.IsLocalMode)
+                {
+                    var baseQuery = _taskRepository.GetQuery(userId).Where(x => x.Date == date.ToString("dd/MM/yyyy"));
+                    var query = list == "All lists" ?
+                    (hideDoneTask == false ? 
+                        baseQuery : 
+                        baseQuery.Where(x => x.Archived == !hideDoneTask)) :
+                    (hideDoneTask == false ? 
+                        baseQuery.Where(x => x.List == list) : 
+                        baseQuery.Where(x => x.List == list && x.Archived == !hideDoneTask));
+
+                    var taskList = query.ToList();
+                    if (taskList != null)
                     {
-                        TaskList.Insert(t.Index, t.Object);
-                    }));
-                _disposables.Add(query.ObserveModified()
-                     .Select(change => change.Document.ToObject<TaskModel>(ServerTimestampBehavior.Estimate))
-                     .Select(taskItem => (TaskItem: taskItem, ViewModel: TaskList.FirstOrDefault(x => x.Id == taskItem.Id)))
-                     .Where(t => t.ViewModel != null)
-                     .Subscribe(t =>
-                     {
-                         t.ViewModel.Update(t.TaskItem);
-                     }));
-                _disposables.Add(query.ObserveRemoved()
-                     .Select(change => TaskList.FirstOrDefault(x => x.Id == change.Document.Id))
-                     .Subscribe(viewModel =>
-                     {
-                         TaskList.Remove(viewModel);
-                     }));
-                _disposables.Add(query.AsObservable()
-                    .Subscribe(list =>
-                    {
-                        if (list.Count == 0)
+                        TaskList = new ObservableCollection<TaskModel>(taskList);
+                        if (TaskList.Count == 0)
                         {
                             TaskListState = LayoutState.Empty;
                         }
@@ -266,12 +251,61 @@ namespace ToDoApp.ViewModels
                         {
                             TaskListState = LayoutState.None;
                         }
-                    }));
+                    }
+                }
+                else
+                {
+                    var query = list == "All lists" ?
+                    (hideDoneTask == false ? 
+                        _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy")) :
+                        _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy"), "archived", !hideDoneTask)) :
+                    (hideDoneTask == false ?
+                        _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy"), "list", list) :
+                        _taskRepository.GetAllContains(userId, "date", date.ToString("dd/MM/yyyy"), "list", list, "archived", !hideDoneTask));
+
+                    #region disposables
+
+                    _disposables.Clear();
+                    _disposables.Add(query.ObserveAdded()
+                        .Select(change => (Object: change.Document.ToObject<TaskModel>(ServerTimestampBehavior.Estimate), Index: change.NewIndex))
+                        .Subscribe(t =>
+                        {
+                            TaskList.Insert(t.Index, t.Object);
+                        }));
+                    _disposables.Add(query.ObserveModified()
+                         .Select(change => change.Document.ToObject<TaskModel>(ServerTimestampBehavior.Estimate))
+                         .Select(taskItem => (TaskItem: taskItem, ViewModel: TaskList.FirstOrDefault(x => x.Id == taskItem.Id)))
+                         .Where(t => t.ViewModel != null)
+                         .Subscribe(t =>
+                         {
+                             t.ViewModel.Update(t.TaskItem);
+                         }));
+                    _disposables.Add(query.ObserveRemoved()
+                         .Select(change => TaskList.FirstOrDefault(x => x.Id == change.Document.Id))
+                         .Subscribe(viewModel =>
+                         {
+                             TaskList.Remove(viewModel);
+                         }));
+                    _disposables.Add(query.AsObservable()
+                        .Subscribe(list =>
+                        {
+                            if (list.Count == 0)
+                            {
+                                TaskListState = LayoutState.Empty;
+                            }
+                            else
+                            {
+                                TaskListState = LayoutState.None;
+                            }
+                        }));
+
+                    #endregion
+                }
             }
             catch (Exception ex)
             {
                 MainState = LayoutState.Error;
-                //Debug.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
 

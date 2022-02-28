@@ -149,7 +149,6 @@
                                         <VisualState.Setters>
                                             <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource LightCardDisabledBackgroundColor}, Dark={StaticResource DarkCardDisabledBackgroundColor}}"/>
                                             <Setter Property="HasShadow" Value="False"/>
-                                            <Setter Property="IsEnabled" Value="False"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>
@@ -323,7 +322,7 @@
                                     <Frame
                                         Padding="10"
                                         Margin="10, 5"
-                                        CornerRadius="20">
+                                        CornerRadius="8">
                                         <Frame.GestureRecognizers>
                                             <DragGestureRecognizer
                                                 CanDrag="True"

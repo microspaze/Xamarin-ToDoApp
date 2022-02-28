@@ -3,8 +3,11 @@ using Prism.DryIoc;
 using Prism.Ioc;
 using System;
 using ToDoApp.Auth;
+using ToDoApp.Helpers;
 using ToDoApp.Models;
+using ToDoApp.Repositories;
 using ToDoApp.Repositories.FirestoreRepository;
+using ToDoApp.Repositories.Localstore;
 using ToDoApp.Services.DateService;
 using ToDoApp.ViewModels;
 using ToDoApp.ViewModels.Dialogs;
@@ -73,8 +76,17 @@ namespace ToDoApp
             containerRegistry.RegisterRegionServices();
 
             containerRegistry.Register<IDateService, DateService>();
-            containerRegistry.Register<IFirestoreRepository<TaskModel>, TasksRepository>();
-            containerRegistry.Register<IFirestoreRepository<ListModel>, ListsRepository>();
+
+            if (Constants.IsLocalMode)
+            {
+                containerRegistry.Register<IRepository<TaskModel>, TasksLocalRepository>();
+                containerRegistry.Register<IRepository<ListModel>, ListsLocalRepository>();
+            }
+            else
+            {
+                containerRegistry.Register<IRepository<TaskModel>, TasksRepository>();
+                containerRegistry.Register<IRepository<ListModel>, ListsRepository>();
+            }
 
             containerRegistry.RegisterForNavigation<NavigationPage>("NavigationPage");
             containerRegistry.RegisterForNavigation<WelcomePage, WelcomePageViewModel>("WelcomePage");

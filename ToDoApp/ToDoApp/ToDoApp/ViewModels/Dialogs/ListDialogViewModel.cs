@@ -9,7 +9,7 @@ using System.Windows.Input;
 using ToDoApp.Auth;
 using ToDoApp.Helpers;
 using ToDoApp.Models;
-using ToDoApp.Repositories.FirestoreRepository;
+using ToDoApp.Repositories;
 using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -23,7 +23,7 @@ namespace ToDoApp.ViewModels.Dialogs
         private string _list;
         private string _fromPage;
 
-        private IFirestoreRepository<ListModel> _listRepository;
+        private IRepository<ListModel> _listRepository;
 
         #endregion
 
@@ -47,7 +47,7 @@ namespace ToDoApp.ViewModels.Dialogs
 
         public ListDialogViewModel(
             INavigationService navigationService,
-            IFirestoreRepository<ListModel> listRepository) : base(navigationService)
+            IRepository<ListModel> listRepository) : base(navigationService)
         {
             _listRepository = listRepository;
 
@@ -131,9 +131,8 @@ namespace ToDoApp.ViewModels.Dialogs
             var auth = DependencyService.Get<IFirebaseAuthentication>();
             var userId = auth.GetUserId();
 
-            var querySnapshot = await _listRepository.GetAll(userId).GetAsync();
-            var list = querySnapshot.ToObjects<ListModel>();
             var listToAdd = new List<ListModel>();
+            var list = await _listRepository.GetAllAsync(userId);
             if (list.Count() > 0)
             {
                 listToAdd = list.ToList();

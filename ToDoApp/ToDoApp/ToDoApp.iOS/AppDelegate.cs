@@ -1,6 +1,8 @@
 ﻿using Foundation;
+using ToDoApp.Auth;
 using ToDoApp.iOS.Auth;
 using UIKit;
+using Xamarin.Forms;
 
 namespace ToDoApp.iOS
 {
@@ -21,8 +23,15 @@ namespace ToDoApp.iOS
         {
             global::Xamarin.Forms.Forms.Init();
 
-            Xamarin.Forms.DependencyService.Register<FirebaseAuthentication>();
-            Firebase.Core.App.Configure();
+            if (Helpers.Constants.IsLocalMode)
+            {
+                DependencyService.Register<IFirebaseAuthentication, ToDoApp.Auth.LocalAuthentication>();
+            }
+            else
+            {
+                DependencyService.Register<IFirebaseAuthentication, FirebaseAuthentication>();
+                Firebase.Core.App.Configure();
+            }
 
             LoadApplication(new App());
             return base.FinishedLaunching(app, options);
